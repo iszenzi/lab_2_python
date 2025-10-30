@@ -2,12 +2,18 @@ import os
 import logging
 from datetime import datetime
 
-from src.exceptions import FileNotExistError, NotIsDirectoryError, TooManyArgumentsError
+from src.exceptions import (
+    FileNotExistError,
+    NotIsDirectoryError,
+    TooManyArgumentsError,
+    EmptyPathError,
+    IsDirectoryError,
+)
 
 
 def ls(string: str):
     """
-    Отображает содержимое каталога
+    Отображение содержимого указанного каталога
     :param string: строка аргументов команды ls
     """
     try:
@@ -44,7 +50,7 @@ def ls(string: str):
                     path = os.path.expanduser("~")
                 # Преобразование пути в абсолютный
                 path = os.path.abspath(path)
-                # Проверка на существование файла
+                # Проверка существования файла
                 if not os.path.exists(path):
                     raise FileNotExistError(f"Файла '{path}' не существует")
                 # Проверка является ли путь каталогом
@@ -127,7 +133,7 @@ def cd(path: str):
             path = os.path.expanduser("~")
         # Преобразование пути в абсолютный
         path = os.path.abspath(path)
-        # Проверка на существование файла
+        # Проверка существования файла
         if not os.path.exists(path):
             raise FileNotExistError(f"Файла '{path}' не существует")
         # Проверка является ли путь каталогом
@@ -143,4 +149,41 @@ def cd(path: str):
         # Логирование ошибки
         logging.error(f"ERROR: {str(e)}")
         print(f"\nERROR: {str(e)}\n")
+        return
+
+
+def cat(path: str):
+    """
+    Вывод содержимого указанного файла
+    :param path: путь к файлу
+    """
+    try:
+        # Проверка ввода пустго пути
+        if not path:
+            raise EmptyPathError("Вы не ввели путь к файлу")
+        # Проверка количества аргумент
+        if len(path.split()) > 1:
+            raise TooManyArgumentsError("Слишком много аргументов")
+
+        path = path.strip()
+        # Преобразование путь в абсолютный
+        path = os.path.abspath(path)
+        # Проверка существования файла
+        if not os.path.exists(path):
+            raise FileNotExistError(f"Файла '{path}' не существует")
+        # Проверка является ли путь каталогом
+        if os.path.isdir(path):
+            raise IsDirectoryError(f"'{path}' является каталогом")
+
+        file = open(path)
+        for line in file.readlines():
+            print(line, end="")
+        # Логирование успешной команды
+        logging.info(f"cat {path}")
+        return
+
+    except Exception as e:
+        # Логирование ошибки
+        logging.error(f"ERROR: {str(e)}")
+        print(f"ERROR: {str(e)}")
         return

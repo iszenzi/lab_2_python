@@ -12,3 +12,11 @@ class NotIsDirectoryError(CommandError):
 
 class TooManyArgumentsError(CommandError):
     pass
+
+
+class EmptyPathError(CommandError):
+    pass
+
+
+class IsDirectoryError(CommandError):
+    pass

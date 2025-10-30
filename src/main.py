@@ -1,6 +1,6 @@
 import os
 from src.logger import setup_logging
-from src.commands import ls, cd
+from src.commands import ls, cd, cat
 
 
 def main():
@@ -16,6 +16,8 @@ def main():
             ls(argument)
         if command == "cd":
             cd(argument)
+        if command == "cat":
+            cat(argument)
         if command == "exit":
             break
 
