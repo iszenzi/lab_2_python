@@ -1,20 +1,25 @@
-from src.power import power_function
-from src.constants import SAMPLE_CONSTANT
+import os
+from src.logger import setup_logging
+from src.commands import ls, cd
 
 
-def main() -> None:
-    """
-    Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
-    :return: Данная функция ничего не возвращает
-    """
+def main():
+    while True:
+        current_dir = os.getcwd()
+        user_input = input(f"{current_dir}$ ")
+        if not user_input.strip():
+            continue
+        args = user_input.split()
+        command = args[0]
+        argument = " ".join(args[1:])
+        if command == "ls":
+            ls(argument)
+        if command == "cd":
+            cd(argument)
+        if command == "exit":
+            break
 
-    target, degree = map(int, input("Введите два числа разделенные пробелом: ").split(" "))
-
-    result = power_function(target=target, power=degree)
-
-    print(result)
-
-    print(SAMPLE_CONSTANT)
 
 if __name__ == "__main__":
+    setup_logging()
     main()
