@@ -1,6 +1,6 @@
 import os
 from src.logger import setup_logging
-from src.commands import ls, cd, cat, cp, mv
+from src.commands import ls, cd, cat, cp, mv, rm
 
 
 def main():
@@ -14,16 +14,18 @@ def main():
         argument = " ".join(args[1:])
         if command == "ls":
             ls(argument)
-        if command == "cd":
+        elif command == "cd":
             cd(argument)
-        if command == "cat":
+        elif command == "cat":
             cat(argument)
-        if command == "exit":
+        elif command == "exit":
             break
-        if command == "cp":
+        elif command == "cp":
             cp(argument)
-        if command == "mv":
+        elif command == "mv":
             mv(argument)
+        elif command == "rm":
+            rm(argument)
 
 
 if __name__ == "__main__":

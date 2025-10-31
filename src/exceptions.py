@@ -24,3 +24,11 @@ class EmptyPathError(CommandError):
 
 class IsDirectoryError(CommandError):
     pass
+
+
+class AccessError(CommandError):
+    pass
+
+
+class FileAlreadyExistsError(CommandError):
+    pass
