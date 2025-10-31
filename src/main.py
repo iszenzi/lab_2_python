@@ -1,6 +1,6 @@
 import os
 from src.logger import setup_logging
-from src.commands import ls, cd, cat
+from src.commands import ls, cd, cat, cp, mv
 
 
 def main():
@@ -20,8 +20,18 @@ def main():
             cat(argument)
         if command == "exit":
             break
+        if command == "cp":
+            cp(argument)
+        if command == "mv":
+            mv(argument)
 
 
 if __name__ == "__main__":
     setup_logging()
     main()
+
+
+"""
+нужно ли разбираться с правами доступа? в команде cp нужно проверять права доступа? в команде ls выводить права доступа
+
+"""

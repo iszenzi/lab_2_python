@@ -14,6 +14,10 @@ class TooManyArgumentsError(CommandError):
     pass
 
 
+class TooLittleArgumentsError(CommandError):
+    pass
+
+
 class EmptyPathError(CommandError):
     pass
 

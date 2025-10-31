@@ -1,5 +1,6 @@
 import os
 import logging
+import shutil
 from datetime import datetime
 
 from src.exceptions import (
@@ -8,10 +9,11 @@ from src.exceptions import (
     TooManyArgumentsError,
     EmptyPathError,
     IsDirectoryError,
+    TooLittleArgumentsError,
 )
 
 
-def ls(string: str):
+def ls(string: str) -> None:
     """
     Отображение содержимого указанного каталога
     :param string: строка аргументов команды ls
@@ -33,14 +35,17 @@ def ls(string: str):
 
         if not parts:
             paths = ["."]
+
+        if not paths:
+            paths = ["."]
         # Обработка каждого пути из списка аргументов
         for path in paths:
             try:
-                if path == "-l" or path.strip() == "-l":
+                """if path == "-l" or path.strip() == "-l":
                     path = "."
                     long_format = True
-
-                elif path == ".":
+                print(path)"""
+                if path == ".":
                     path = os.getcwd()
 
                 elif path == "..":
@@ -107,13 +112,13 @@ def ls(string: str):
         return
 
 
-def cd(path: str):
+def cd(path: str) -> None:
     """
     Переход в указанный каталог
     :param path: путь к каталогу
     """
     try:
-        # Проверка на количество аргументов команды
+        # Проверка количество аргументов команды
         if len(path.split()) > 1:
             raise TooManyArgumentsError("Слишком много аргументов")
 
@@ -152,13 +157,13 @@ def cd(path: str):
         return
 
 
-def cat(path: str):
+def cat(path: str) -> None:
     """
     Вывод содержимого указанного файла
     :param path: путь к файлу
     """
     try:
-        # Проверка ввода пустго пути
+        # Проверка ввода пустого пути
         if not path:
             raise EmptyPathError("Вы не ввели путь к файлу")
         # Проверка количества аргумент
@@ -166,7 +171,7 @@ def cat(path: str):
             raise TooManyArgumentsError("Слишком много аргументов")
 
         path = path.strip()
-        # Преобразование путь в абсолютный
+        # Преобразование пути в абсолютный
         path = os.path.abspath(path)
         # Проверка существования файла
         if not os.path.exists(path):
@@ -187,3 +192,75 @@ def cat(path: str):
         logging.error(f"ERROR: {str(e)}")
         print(f"ERROR: {str(e)}")
         return
+
+
+def cp(string: str) -> None:
+    """
+    Копирование файла или каталога в указанный каталог
+    :param string: строка аргументов команды cp
+    """
+    try:
+        # Проверка ввода пустого пути
+        if not string:
+            raise EmptyPathError("Вы не ввели путь к файлу")
+
+        parts = string.split()
+        # Проверка количества аргументов
+        if len(parts) < 2:
+            raise TooLittleArgumentsError("Слишком мало аргументов")
+        # Флаг рекурсивного копирования
+        recursive = False
+        source = None
+        destination = None
+
+        for part in parts:
+            if part == "-r":
+                recursive = True
+            elif source is None:
+                source = part
+            elif destination is None:
+                destination = part
+            else:
+                raise TooManyArgumentsError("Cлишком много аругментов")
+
+        if source is None or destination is None:
+            raise ValueError()
+        source = os.path.abspath(source)
+        destination = os.path.abspath(destination)
+        # Проверка существования файла
+        if not os.path.exists(source):
+            raise FileNotExistError(f"Файла '{source}' не существует")
+        if not os.path.exists(destination):
+            raise FileNotExistError(f"Файла '{destination}' не существует")
+        # Проверка является ли путь каталогом
+        if not os.path.isdir(destination):
+            raise NotIsDirectoryError(f"'{destination} не является каталогом'")
+        # Проверка является ли источник каталогом
+        if os.path.isdir(source):
+            # Проверка наличия ргумента '-r'
+            if not recursive:
+                raise TooLittleArgumentsError(
+                    f"'{source}' является каталогом, требуется аргумент '-r'"
+                )
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+            # Логирование успешной команды
+            logging.info(f"cp {string}")
+            return
+        else:
+            # Проверка отсутствия аргумента '-r'
+            if recursive:
+                raise TooManyArgumentsError("Аргумент '-r' не требуется")
+            shutil.copy2(source, destination)
+            # Логирование успешной команды
+            logging.info(f"cp {string}")
+            return
+
+    except Exception as e:
+        # Логирование ошибки
+        logging.error(f"ERROR: {str(e)}")
+        print(f"ERROR: {str(e)}")
+        return
+
+
+def mv(string: str) -> None:
+    pass
