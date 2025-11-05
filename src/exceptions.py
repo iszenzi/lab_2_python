@@ -32,3 +32,7 @@ class AccessError(CommandError):
 
 class FileAlreadyExistsError(CommandError):
     pass
+
+
+class UnknownFlagError(CommandError):
+    pass

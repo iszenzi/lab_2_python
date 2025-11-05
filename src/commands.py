@@ -11,6 +11,7 @@ from src.exceptions import (
     TooLittleArgumentsError,
     AccessError,
     FileAlreadyExistsError,
+    UnknownFlagError,
 )
 
 
@@ -38,16 +39,20 @@ def cd(path: str) -> None:
 
         elif path == "~":
             path = os.path.expanduser("~")
+
         # Преобразование пути в абсолютный
         path = os.path.abspath(path)
+
         # Проверка существования файла
         if not os.path.exists(path):
-            raise FileNotExistError(f"Файла '{path}' не существует")
+            raise FileNotExistError(f"Пути '{path}' не существует")
         # Проверка является ли путь каталогом
         if not os.path.isdir(path):
             raise NotIsDirectoryError(f"'{path}' не является каталогом")
+
         # Изменение каталога
         os.chdir(path)
+
         # Логирование успешной команды
         logging.info(f"cd {path}")
         return
@@ -73,8 +78,10 @@ def cat(path: str) -> None:
             raise TooManyArgumentsError("Слишком много аргументов")
 
         path = path.strip()
+
         # Преобразование пути в абсолютный
         path = os.path.abspath(path)
+
         # Проверка существования файла
         if not os.path.exists(path):
             raise FileNotExistError(f"Файла '{path}' не существует")
@@ -82,9 +89,10 @@ def cat(path: str) -> None:
         if os.path.isdir(path):
             raise IsDirectoryError(f"'{path}' является каталогом")
 
-        file = open(path)
+        file = open(path, "r", encoding="utf-8")
         for line in file.readlines():
             print(line, end="")
+
         # Логирование успешной команды
         logging.info(f"cat {path}")
         return
@@ -107,9 +115,11 @@ def cp(string: str) -> None:
             raise EmptyPathError("Вы не ввели путь к файлу")
 
         parts = string.split()
+
         # Проверка количества аргументов
         if len(parts) < 2:
             raise TooLittleArgumentsError("Слишком мало аргументов")
+
         # Флаг рекурсивного копирования
         recursion = False
         # Источник
@@ -117,6 +127,7 @@ def cp(string: str) -> None:
         # Путь назначения
         destination = None
 
+        # Обработка аргументов
         for part in parts:
             if part == "-r":
                 recursion = True
@@ -125,13 +136,18 @@ def cp(string: str) -> None:
             elif destination is None:
                 destination = part
             else:
-                raise TooManyArgumentsError("Cлишком много аргументов")
+                if part.startswith("-"):
+                    raise UnknownFlagError(f"Незивестный флаг '{part}'")
+                else:
+                    raise TooManyArgumentsError("Cлишком много аргументов")
 
         if source is None or destination is None:
-            raise ValueError("Источник или путь назначения отсутствуют")
+            raise ValueError("Источник или путь назначения не указаны")
+
         # Преобразование путей в абсолютный
         source = os.path.abspath(source)
         destination = os.path.abspath(destination)
+
         # Проверка существования файла
         if not os.path.exists(source):
             raise FileNotExistError(f"Файла '{source}' не существует")
@@ -140,6 +156,7 @@ def cp(string: str) -> None:
         # Проверка является ли путь каталогом
         if not os.path.isdir(destination):
             raise NotIsDirectoryError(f"'{destination}' не является каталогом'")
+
         # Проверка является ли источник каталогом
         if os.path.isdir(source):
             # Проверка наличия аргумента '-r'
@@ -148,17 +165,16 @@ def cp(string: str) -> None:
                     f"'{source}' является каталогом, требуется аргумент '-r'"
                 )
             shutil.copytree(source, destination, dirs_exist_ok=True)
-            # Логирование успешной команды
-            logging.info(f"cp {string}")
-            return
+
         else:
             # Проверка отсутствия аргумента '-r'
             if recursion:
                 raise TooManyArgumentsError("Аргумент '-r' не требуется")
             shutil.copy2(source, destination)
-            # Логирование успешной команды
-            logging.info(f"cp {string}")
-            return
+
+        # Логирование успешной команды
+        logging.info(f"cp {string}")
+        return
 
     except Exception as e:
         # Логирование ошибки
@@ -178,17 +194,19 @@ def mv(string: str) -> None:
             raise EmptyPathError("Вы не ввели путь к файлу")
 
         parts = string.split()
+
         # Проверка количества аргументов
         if len(parts) > 2:
             raise TooManyArgumentsError("Слишком много аргументов")
         if len(parts) < 2:
             raise TooLittleArgumentsError("Слишком мало аргументов")
+
         # Источник
         source = parts[0]
         # Путь назначения
         destination = parts[1]
 
-        # Преобразование путей в абсолютный
+        # Преобразование путей в абсолютные
         source = os.path.abspath(source)
         destination = os.path.abspath(destination)
 
@@ -198,6 +216,7 @@ def mv(string: str) -> None:
         # Проверка права чтения файла
         if not os.access(source, os.R_OK):
             raise AccessError(f"Нет прав на чтение '{source}'")
+
         # Родительская папка каталога назначения
         destination_dirname = os.path.dirname(destination)
         # Проверка существования родительской папки каталога назначения
@@ -213,9 +232,9 @@ def mv(string: str) -> None:
             # Есть ли в папке уже такой файл
             if os.path.exists(destination):
                 raise FileAlreadyExistsError(f"'{destination}' уже существует")
-            shutil.move(source, destination)
+            """shutil.move(source, destination)
             logging.info(f"mv {string}")
-            return
+            return"""
         # Если каталог назначения существует и он файл
         elif os.path.exists(destination) and os.path.isfile(destination):
             raise FileAlreadyExistsError(f"'{destination}' уже существует")
@@ -242,19 +261,29 @@ def rm(string: str) -> None:
             raise EmptyPathError("Вы не ввели путь к файлу")
 
         parts = string.split()
+
         # Флаг рекурсивного удаления
         recursion = False
         path = None
+
+        # Обработка аргументов
         for part in parts:
             if part == "-r":
                 recursion = True
             elif path is None:
                 path = part
             else:
-                raise TooManyArgumentsError("Cлишком много аргументов")
+                if part.startswith("-"):
+                    raise UnknownFlagError("Неизвестный флаг")
+                else:
+                    raise TooManyArgumentsError("Cлишком много аргументов")
+
         if path is None:
             raise EmptyPathError("Вы не ввели путь к файлу")
+
+        ##Преобразование пути в абсолютный
         path = os.path.abspath(path)
+
         # Проверка существования файла
         if not os.path.exists(path):
             raise FileNotExistError(f"Файла '{path}' не существует")
@@ -269,6 +298,7 @@ def rm(string: str) -> None:
             raise AccessError("Нельзя удалить родительский каталог")
         if path == "~" or path == os.path.expanduser("~"):
             raise AccessError("Нельзя удалить домашний каталог")
+
         # Проверка является ли путь каталогом
         if os.path.isdir(path):
             if not recursion:
@@ -276,20 +306,23 @@ def rm(string: str) -> None:
                     f"'{path}' является каталогом, требуется аргумент '-r'"
                 )
             check = input(f"Удалить каталог '{path}'? (y/n):").strip().lower()
+
             if check != "y":
                 print("Удаление отменено")
                 return
+
             if not os.access(path, os.W_OK):
                 raise AccessError(f"Недостаточно прав для удаления '{path}'")
+
             shutil.rmtree(path)
-            logging.info(f"rm {string}")
-            return
+
         else:
             if recursion:
                 raise TooManyArgumentsError("Аргумент -r не требуется")
             os.remove(path)
-            logging.info(f"rm {string}")
-            return
+
+        logging.info(f"rm {string}")
+        return
 
     except Exception as e:
         # Логирование ошибки

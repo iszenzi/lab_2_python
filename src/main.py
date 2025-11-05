@@ -3,6 +3,7 @@ from src.logger import setup_logging
 from src.commands import cd, cat, cp, mv, rm
 from src.get_ls import ls
 from src.get_zip import zip, unzip, tar, untar
+from src.get_grep import grep
 
 
 def main():
@@ -34,6 +35,8 @@ def main():
             tar(argument)
         elif command == "untar":
             untar(argument)
+        elif command == "grep":
+            grep(argument)
         elif command == "exit":
             break
 
@@ -44,5 +47,7 @@ if __name__ == "__main__":
 
 """
 нужно ли разбираться с правами доступа? в команде cp нужно проверять права доступа? в команде ls выводить права доступа
+как понять какие ошибки можно объединить в один класс?
+
 
 """

@@ -12,11 +12,17 @@ from src.exceptions import (
 
 
 def zip(string: str) -> None:
+    """
+    Создание ZIP-архива из каталога
+    :param string: строка аргументов команды zip
+    """
     try:
         # Проверка ввода пустого пути
         if not string:
             raise EmptyPathError("Вы не ввели путь к файлу")
+
         parts = string.split()
+
         # Проверка количества аргументов
         if len(parts) > 2:
             raise TooManyArgumentsError("Слишком много аргументов")
@@ -26,12 +32,15 @@ def zip(string: str) -> None:
         folder = parts[0]
         archive = parts[1]
 
+        # Преобразование путей в абсолютные
         folder = os.path.abspath(folder)
         archive = os.path.abspath(archive)
+
         # Проверка наличия нужного расширения
         if not archive.lower().endswith(".zip"):
             old_name = os.path.splitext(archive)[0]
             archive = old_name + ".zip"
+
         # Проверка существования файла
         if not os.path.exists(folder):
             raise FileNotExistError(f"Файла {folder} не существует")
@@ -54,9 +63,11 @@ def zip(string: str) -> None:
                     archive_name = os.path.join(name, relative_path)
                     # Запись файла в архив
                     zipka.write(file_path, archive_name)
+
         # Логирование успешной команды
         logging.info(f"zip {string}")
         return
+
     except Exception as e:
         # Логирование ошибки
         logging.error(f"ERROR: {str(e)}")
@@ -65,6 +76,10 @@ def zip(string: str) -> None:
 
 
 def unzip(archive: str) -> None:
+    """
+    Распаковка ZIP-архива в текущий каталог
+    :param archive: путь к ZIP-архиву
+    """
     try:
         # Проверка ввода пустого пути
         if not archive:
@@ -74,7 +89,10 @@ def unzip(archive: str) -> None:
             raise TooManyArgumentsError("Слишком много аргументов")
 
         archive = archive.strip()
+
+        # Преобразование пути в абсолютный
         archive = os.path.abspath(archive)
+
         # Проверка наличия нужного расширения
         if not archive.lower().endswith(".zip"):
             raise ValueError("Файл должен иметь расширенение .zip")
@@ -86,8 +104,9 @@ def unzip(archive: str) -> None:
             raise NotIsDirectoryError(f"'{archive}' не является файлом")
 
         with zipfile.ZipFile(archive, "r") as zipka:  # (путь к файлу, режим работы)
-            # Извелечение всех файлов из архива в текущую директорию
+            # Извелечение всех файлов из архива в текущий каталог
             zipka.extractall()
+
         # Логирование успешной команды
         logging.info(f"unzip {archive}")
         return
@@ -100,11 +119,17 @@ def unzip(archive: str) -> None:
 
 
 def tar(string: str) -> None:
+    """
+    Создание TAR.GZ-архива из каталога
+    :param string: аргументы команды tar
+    """
     try:
         # Проверка ввода пустого пути
         if not string:
             raise EmptyPathError("Вы не ввели путь к файлу")
+
         parts = string.split()
+
         # Проверка количества аргументов
         if len(parts) > 2:
             raise TooManyArgumentsError("Слишком много аргументов")
@@ -114,8 +139,10 @@ def tar(string: str) -> None:
         folder = parts[0]
         archive = parts[1]
 
+        # Преобразование путей в абсолютные
         folder = os.path.abspath(folder)
         archive = os.path.abspath(archive)
+
         # Проверка наличия нужного расширения
         if not archive.lower().endswith(".tar.gz"):
             old_name = os.path.splitext(archive)[0]
@@ -128,11 +155,13 @@ def tar(string: str) -> None:
             raise NotIsDirectoryError(f"'{folder}' не является каталогом")
 
         with tarfile.open(archive, "w:gz") as tar:  # (путь к файлу, режим работы)
-            # Добваление папки в архив
+            # Добваление каталога в архив
             tar.add(folder, arcname=os.path.basename(folder))
+
         # Логирование успешной команды
         logging.info(f"tar {string}")
         return
+
     except Exception as e:
         # Логирование ошибки
         logging.error(f"ERROR: {str(e)}")
@@ -141,6 +170,10 @@ def tar(string: str) -> None:
 
 
 def untar(archive: str) -> None:
+    """
+    Распаковка TAR.GZ-архива в текущий каталог
+    :param archive: путь к TAR.GZ-архиву
+    """
     try:
         # Проверка ввода пустого пути
         if not archive:
@@ -150,7 +183,10 @@ def untar(archive: str) -> None:
             raise TooManyArgumentsError("Слишком много аргументов")
 
         archive = archive.strip()
+
+        # Преобразование пути в абсолютный
         archive = os.path.abspath(archive)
+
         # Проверка наличия нужного расширения
         if not archive.lower().endswith(".tar.gz"):
             raise ValueError("Файл должен иметь расширенение .tar.gz")
@@ -162,7 +198,7 @@ def untar(archive: str) -> None:
             raise NotIsDirectoryError(f"'{archive}' не является файлом")
 
         with tarfile.open(archive, "r:gz") as tar:  # (путь к файлу, режим работы)
-            # Извелечение всех файлов из архива в текущую директорию
+            # Извелечение всех файлов из архива в текущий каталог
             tar.extractall()
         # Логирование успешной команды
         logging.info(f"untar {archive}")
