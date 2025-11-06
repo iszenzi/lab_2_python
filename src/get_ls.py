@@ -1,11 +1,7 @@
 import os
 import logging
 from datetime import datetime
-from src.exceptions import (
-    FileNotExistError,
-    NotIsDirectoryError,
-    AccessError,
-)
+from src.exceptions import FileNotExistError, NotIsDirectoryError
 
 
 def ls(string: str) -> None:
@@ -50,8 +46,6 @@ def ls(string: str) -> None:
                 # Проверка является ли путь каталогом
                 if not os.path.isdir(path):
                     raise NotIsDirectoryError(f"'{path}' не является каталогом")
-                if not os.access(path, os.R_OK):
-                    raise AccessError(f"Недостаточно прав для чтения '{path}'")
                 # Список файлов в каталоге
                 files = os.listdir(path)
 
@@ -91,11 +85,12 @@ def ls(string: str) -> None:
                 print(f"\nERROR: {str(e)}")
                 success_command = False
                 continue
+
         # Логирование успешной команды
         if success_command:
             logging.info(f"ls {string}")
-
         return
+
     except Exception as e:
         # Логирование ошибки
         logging.error(f"ERROR: {str(e)}")

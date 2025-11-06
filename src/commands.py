@@ -92,6 +92,7 @@ def cat(path: str) -> None:
         file = open(path, "r", encoding="utf-8")
         for line in file.readlines():
             print(line, end="")
+        print("\n")
 
         # Логирование успешной команды
         logging.info(f"cat {path}")
@@ -232,9 +233,7 @@ def mv(string: str) -> None:
             # Есть ли в папке уже такой файл
             if os.path.exists(destination):
                 raise FileAlreadyExistsError(f"'{destination}' уже существует")
-            """shutil.move(source, destination)
-            logging.info(f"mv {string}")
-            return"""
+
         # Если каталог назначения существует и он файл
         elif os.path.exists(destination) and os.path.isfile(destination):
             raise FileAlreadyExistsError(f"'{destination}' уже существует")
