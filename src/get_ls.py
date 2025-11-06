@@ -64,7 +64,7 @@ def ls(string: str) -> None:
                         ).strftime("%d-%m-%y %H:%M:%S")
                         if os.path.isdir(file_path):
                             print(
-                                f"DIR {file}  SIZE({size}) lAST CHANGE({time_change})"
+                                f"DIR {file}  SIZE({size}) LAST CHANGE({time_change})"
                             )
                         elif os.path.isfile(file_path):
                             print(

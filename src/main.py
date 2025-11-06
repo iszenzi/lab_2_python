@@ -1,4 +1,5 @@
 import os
+import logging
 from src.logger import setup_logging
 from src.commands import cd, cat, cp, mv, rm
 from src.get_ls import ls
@@ -39,6 +40,11 @@ def main():
             grep(argument)
         elif command == "exit":
             break
+        else:
+            e = f"Неизвестная команда '{command}'"
+            logging.error(f"ERROR: {e}")
+            print(f"ERROR: {e}")
+            continue
 
 
 if __name__ == "__main__":
