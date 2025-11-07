@@ -1,7 +1,11 @@
 import os
 import logging
 from datetime import datetime
-from src.exceptions import FileNotExistError, NotIsDirectoryError
+from src.exceptions import (
+    FileNotExistError,
+    NotIsDirectoryError,
+    UnknownFlagError,
+)
 
 
 def ls(string: str) -> None:
@@ -22,7 +26,10 @@ def ls(string: str) -> None:
             if part == "-l":
                 long_format = True
             else:
-                paths.append(part)
+                if part.startswith("-"):
+                    raise UnknownFlagError(f"Неизвестный флаг '{part}'")
+                else:
+                    paths.append(part)
 
         if not parts:
             paths = ["."]
