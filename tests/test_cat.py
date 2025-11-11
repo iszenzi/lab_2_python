@@ -23,7 +23,7 @@ class TestCat:
             mock_print.assert_any_call("TEEEEEEST TEST TEST", end="")
             mock_logging_info.assert_called_once_with(f"cat {mock_path}")
 
-    def test_cat_not_existing_diк(self):
+    def test_cat_not_existing_dir(self):
         """Тест cat с несуществующим файлом"""
         mock_path = "/test/file.txt"
         with (
@@ -60,8 +60,8 @@ class TestCat:
                 f"ERROR: '{mock_path}' является каталогом"
             )
 
-    def test_cat_too_many_argument(self):
-        """Тест cat с несколькими аргументами"""
+    def test_cat_too_many_arguments(self):
+        """Тест cat с избытком аргументами"""
         with (
             patch("logging.error") as mock_logging_error,
             patch("builtins.print") as mock_print,

@@ -57,8 +57,8 @@ class TestCd:
                 f"ERROR: '{mock_path}' не является каталогом"
             )
 
-    def test_cd_too_many_argument(self):
-        """Тест cd с несколькими аргументами"""
+    def test_cd_too_many_arguments(self):
+        """Тест cd с избытком аргументами"""
         with (
             patch("logging.error") as mock_logging_error,
             patch("builtins.print") as mock_print,
