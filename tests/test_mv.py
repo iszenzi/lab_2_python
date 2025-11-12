@@ -63,7 +63,6 @@ class TestMv:
             patch("os.access", side_effect=[True, True]),  # source R, dirname W
             patch("os.path.isdir", return_value=True),  # destination is dir
             patch("os.path.join", return_value=mock_new_destination),
-            patch("os.path.isfile", return_value=False),  # destination
             patch("shutil.move") as mock_move,
             patch("logging.info") as mock_logging_info,
         ):

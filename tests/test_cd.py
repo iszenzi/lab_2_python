@@ -19,7 +19,7 @@ class TestCd:
 
             mock_logging_info.assert_called_once_with(f"cd {mock_path}")
 
-    def test_cd_not_existing_diк(self):
+    def test_cd_not_existing_dir(self):
         """Тест cd с несуществующим каталогом"""
         mock_path = "/test"
         with (
