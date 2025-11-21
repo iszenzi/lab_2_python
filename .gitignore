@@ -395,3 +395,21 @@ cython_debug/
 # Android studio 3.1+ serialized cache file
 
 .ruff_cache/
+
+# .dockerignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-wheel-metadata/
+*.log
+.git
+.gitignore
+.DS_Store
+.idea/
+.vscode/
+*.swp
